@@ -5,12 +5,12 @@ const express = require('express');
 // const rentals = require('../routes/rentals');
 // const users = require('../routes/users');
 // const auth = require('../routes/auth');
-const histories = require('../routes/histories');
+const sessions = require('../routes/sessions');
 //const error = require('../middleware/error');
 
 module.exports = function(app) {
   app.use(express.json());
   //app.use('/api/auth', auth);
-  app.use('/api/histories', histories);
+  app.use('/api/sessions', sessions);
 //  app.use(error);
 }

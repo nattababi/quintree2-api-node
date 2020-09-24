@@ -1,7 +1,7 @@
 const Joi = require('@hapi/joi');
 const mongoose = require('mongoose');
 
-const History = mongoose.model('History', new mongoose.Schema({
+const Session = mongoose.model('Session', new mongoose.Schema({
   exists: {
     type: Boolean,
     required: true,
@@ -43,7 +43,7 @@ const History = mongoose.model('History', new mongoose.Schema({
   }
 }));
 
-function validateHistory(history) {
+function validateSession(session) {
   // const schema = {
   //   exists: Joi.boolean().required(),
   //   sessionId: Joi.number().min(0).required(),
@@ -58,5 +58,5 @@ function validateHistory(history) {
   return true;
 }
 
-exports.History = History; 
-exports.validate = validateHistory;
+exports.Session = Session; 
+exports.validate = validateSession;
