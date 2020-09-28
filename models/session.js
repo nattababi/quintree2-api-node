@@ -40,6 +40,24 @@ const Session = mongoose.model('Session', new mongoose.Schema({
     trim: true, 
     minlength: 5,
     maxlength: 255
+  },
+  patient: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Patient'
+  },
+  complaint:{
+    type: String,
+    required: true,
+    trim: true, 
+    minlength: 0,
+    maxlength: 255
+  },
+  overread:{
+    type: String,
+    required: true,
+    trim: true, 
+    minlength: 0,
+    maxlength: 4096
   }
 }));
 

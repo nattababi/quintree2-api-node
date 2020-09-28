@@ -29,7 +29,6 @@ router.get("/", async (req, res) => {
     group["group"] = { "$regex": req.query.search, "$options": "i" };
   }
 
-  
   let overreads = await Session
   .find({ $or: [provider, expert, group] })
   .select("-__v")
@@ -42,6 +41,7 @@ router.get("/", async (req, res) => {
   
   overreads =  await Session
     .find({ $or: [provider, expert, group] })
+    .populate('patient')
     .select("-__v")
     .sort(sort)
     .skip(skip)
@@ -90,7 +90,7 @@ router.put("/:id", async (req, res) => {
   );
 
   if (!sessionItem)
-    return res.status(404).send("The session item with the given ID was not found.");
+    return res.status(404).send("The session with the given ID was not found.");
 
   res.send(sessionItem);
 });
@@ -100,7 +100,7 @@ router.delete("/:id", async (req, res) => {
   const sessionItem = await Session.findByIdAndRemove(req.params.id);
 
   if (!sessionItem)
-    return res.status(404).send("The session item with the given ID was not found.");
+    return res.status(404).send("The session with the given ID was not found.");
 
   res.send(sessionItem);
 });
