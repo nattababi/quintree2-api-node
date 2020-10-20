@@ -9,7 +9,7 @@ const router = express.Router();
 router.get("/", async (req, res) => {
   const patients = await Patient.find()
     .select("-__v")
-    //.sort("name");
+  //.sort("name");
   res.send(patients);
 });
 
@@ -18,10 +18,12 @@ router.post("/", async (req, res) => {
   const { error } = validate(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
-  let patient = new Patient({ patientId: req.body.patientId,
-                              phone: req.body.phone,
-                              dob: req.body.dob,
-                              gender: req.body.gender });
+  let patient = new Patient({
+    patientId: req.body.patientId,
+    phone: req.body.phone,
+    dob: req.body.dob,
+    gender: req.body.gender
+  });
   patient = await patient.save();
 
   res.send(patient);
@@ -33,15 +35,8 @@ router.put("/:id", async (req, res) => {
   if (error) return res.status(400).send(error.details[0].message);
 
   const patient = await Patient.findByIdAndUpdate(
-    req.params.id,
-    { patientId: req.body.patientId,
-      phone: req.body.phone,
-      dob: req.body.dob,
-      gender: req.body.gender },
-    
-      {
-      new: true
-    }
+    req.params.id, req.body,
+    { new: true }
   );
 
   if (!patient)

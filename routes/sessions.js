@@ -29,17 +29,17 @@ router.get("/", async (req, res) => {
     group["group"] = { "$regex": req.query.search, "$options": "i" };
   }
 
-  let overreads = await Session
+  let sessions = await Session
   .find({ $or: [provider, expert, group] })
   .select("-__v")
   .sort(sort);
   
-  const total = overreads.length;
+  const total = sessions.length;
   
   const limit = (req.query.pageSize) ? Number(req.query.pageSize) : 12;
   const skip = (req.query.page) ? (Number(req.query.page) - 1)*limit : 0;
   
-  overreads =  await Session
+  sessions =  await Session
     .find({ $or: [provider, expert, group] })
     .populate('patient')
     .select("-__v")
@@ -47,8 +47,8 @@ router.get("/", async (req, res) => {
     .skip(skip)
     .limit(limit);
   
-  console.log("RESULT", overreads.length);
-  res.send({overreads, total});
+  console.log("RESULT", sessions.length);
+  res.send({sessions, total});
 });
 
 //router.post("/", [auth], async (req, res) => {
@@ -77,17 +77,11 @@ router.put("/:id", async (req, res) => {
 
   const sessionItem = await Session.findByIdAndUpdate(
     req.params.id,
-    {
-      exists: req.body.exists,
-      sessionId: req.body.sessionId,
-      started: req.body.started,
-      ended: req.body.ended,
-      provider: req.body.provider,
-      expert: req.body.expert,
-      group: req.body.group
-    },
+    req.body,
     { new: true }
   );
+
+  console.log('PUT:', sessionItem);
 
   if (!sessionItem)
     return res.status(404).send("The session with the given ID was not found.");
@@ -106,7 +100,7 @@ router.delete("/:id", async (req, res) => {
 });
 
 router.get("/:id", validateObjectId, async (req, res) => {
-  const sessionItem = await Session.findById(req.params.id).select("-__v");
+  const sessionItem = await Session.findById(req.params.id).select("-__v").populate('patient');
 
   if (!sessionItem)
     return res.status(404).send("The session item with the given ID was not found.");
