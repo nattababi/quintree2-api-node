@@ -81,6 +81,8 @@ userSchema.methods.generateAuthToken = function() {
     },
     config.get("jwtPrivateKey")
   );
+
+  console.log('TOKEN===', token);
   return token;
 };
 

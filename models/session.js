@@ -21,18 +21,14 @@ const Session = mongoose.model('Session', new mongoose.Schema({
     required: true,
   },
   provider:{
-    type: String,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
     required: true,
-    trim: true, 
-    minlength: 5,
-    maxlength: 255
   },
   expert:{
-    type: String,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
     required: true,
-    trim: true, 
-    minlength: 5,
-    maxlength: 255
   },
   group:{
     type: String,

@@ -42,6 +42,8 @@ router.get("/", async (req, res) => {
   sessions =  await Session
     .find({ $or: [provider, expert, group] })
     .populate('patient')
+    .populate('provider')
+    .populate('expert')
     .select("-__v")
     .sort(sort)
     .skip(skip)

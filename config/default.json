@@ -1,6 +1,6 @@
 {
   "jwtPrivateKey": "unsecureKey",
   "db": "mongodb://localhost/quintree2",
-  "port": "3902",
+  "port": "3903",
   "requiresAuth": true
 }
