@@ -4,7 +4,10 @@ const config = require("config");
 module.exports = function(req, res, next) {
   if (!config.get("requiresAuth")) return next();
 
-  const token = req.header("x-auth-token");
+  let token = req.header("Authorization");
+  // Remove Bearer from string
+  token = token.replace("Bearer ", "");
+
   if (!token) return res.status(401).send("Access denied. No token provided.");
 
   try {
@@ -12,6 +15,6 @@ module.exports = function(req, res, next) {
     req.user = decoded;
     next();
   } catch (ex) {
-    res.status(400).send("Invalid token.");
+    res.status(401).send("Invalid token.");
   }
 };

@@ -4,8 +4,6 @@ const Joi = require('@hapi/joi');
 const mongoose = require("mongoose");
 const { now } = require('lodash');
 
-//const User = mongoose.model('User', new mongoose.Schema({
-
 const userSchema = new mongoose.Schema({
   firstName:{
     type: String,
@@ -69,20 +67,19 @@ const userSchema = new mongoose.Schema({
     default: now()
   }
 });
-//}));
 
 userSchema.methods.generateAuthToken = function() {
   const token = jwt.sign(
     {
       _id: this._id,
       firstName: this.firstName,
+      lastName: this.lastName,
       email: this.email,
       isAdmin: this.isAdmin
     },
     config.get("jwtPrivateKey")
   );
 
-  console.log('TOKEN===', token);
   return token;
 };
 

@@ -1,5 +1,5 @@
 const { Session, validate } = require("../models/session");
-//const auth = require("../middleware/auth");
+const auth = require("../middleware/auth");
 //const admin = require("../middleware/admin");
 const validateObjectId = require("../middleware/validateObjectId");
 const moment = require("moment");
@@ -7,14 +7,14 @@ const mongoose = require("mongoose");
 const express = require("express");
 const router = express.Router();
 
-router.get("/", async (req, res) => {
-
+router.get("/", [auth], async (req, res) => {
+  
   const urlParams = req.query;
 
   let sort = {};
 
-  if (req.query.path && req.query.order) {
-    sort[req.query.path] = req.query.order === 'asc' ? 1 : -1;
+  if (urlParams.path && urlParams.order) {
+    sort[urlParams.path] = urlParams.order === 'asc' ? 1 : -1;
   }
   else {
     sort = { "sessionId": -1 };
@@ -23,34 +23,39 @@ router.get("/", async (req, res) => {
   let expert = {};
   let provider = {};
   let group = {};
-  if (req.query.search) {
-    expert["expert"] = { "$regex": req.query.search, "$options": "i" };
-    provider["provider"] = { "$regex": req.query.search, "$options": "i" };
-    group["group"] = { "$regex": req.query.search, "$options": "i" };
+  if (urlParams.search) {
+    //expert["expert"] = { "$regex": urlParams.search, "$options": "i" };
+    //provider["provider"] = { "$regex": urlParams.search, "$options": "i" };
+    group["group"] = { "$regex": urlParams.search, "$options": "i" };
   }
 
+  let expertQuery = { expert: req.user._id };
+  let providerQuery = { provider: req.user._id };
+  let query = { $or: [providerQuery, expertQuery] };
+
+  if (req.user.isAdmin) {
+    query = {};
+  }
+  // calculate total count
+  let total = await Session
+    //.find({ $or: [provider, expert, group] })
+    .find(query).countDocuments();
+
+  const limit = (urlParams.pageSize) ? Number(urlParams.pageSize) : 6;
+  const skip = (urlParams.page) ? (Number(urlParams.page) - 1) * limit : 0;
+
   let sessions = await Session
-  .find({ $or: [provider, expert, group] })
-  .select("-__v")
-  .sort(sort);
-  
-  const total = sessions.length;
-  
-  const limit = (req.query.pageSize) ? Number(req.query.pageSize) : 12;
-  const skip = (req.query.page) ? (Number(req.query.page) - 1)*limit : 0;
-  
-  sessions =  await Session
-    .find({ $or: [provider, expert, group] })
+    .find(query)
     .populate('patient')
     .populate('provider')
     .populate('expert')
     .select("-__v")
     .sort(sort)
     .skip(skip)
-    .limit(limit);
-  
-  console.log("RESULT", sessions.length);
-  res.send({sessions, total});
+    .limit(limit)
+
+  console.log("RESULT", sessions.length, ",total", total);
+  res.send({ sessions, total });
 });
 
 //router.post("/", [auth], async (req, res) => {
