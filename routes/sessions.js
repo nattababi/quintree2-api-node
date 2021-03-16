@@ -1,6 +1,6 @@
 const { Session, validate } = require("../models/session");
 const auth = require("../middleware/auth");
-//const admin = require("../middleware/admin");
+const admin = require("../middleware/admin");
 const validateObjectId = require("../middleware/validateObjectId");
 const moment = require("moment");
 const mongoose = require("mongoose");
@@ -8,7 +8,7 @@ const express = require("express");
 const router = express.Router();
 
 router.get("/", [auth], async (req, res) => {
-  
+
   const urlParams = req.query;
 
   let sort = {};
@@ -58,8 +58,7 @@ router.get("/", [auth], async (req, res) => {
   res.send({ sessions, total });
 });
 
-//router.post("/", [auth], async (req, res) => {
-router.post("/", async (req, res) => {
+router.post("/", [auth], async (req, res) => {
   const { error } = validate(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
@@ -77,8 +76,7 @@ router.post("/", async (req, res) => {
   res.send(sessionItem);
 });
 
-router.put("/:id", async (req, res) => {
-  //router.put("/:id", [auth], async (req, res) => {
+router.put("/:id", [auth], async (req, res) => {
   const { error } = validate(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
@@ -96,8 +94,7 @@ router.put("/:id", async (req, res) => {
   res.send(sessionItem);
 });
 
-//router.delete("/:id", [auth, admin], async (req, res) => {
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", [auth, admin], async (req, res) => {
   const sessionItem = await Session.findByIdAndRemove(req.params.id);
 
   if (!sessionItem)
@@ -110,7 +107,7 @@ router.get("/:id", validateObjectId, async (req, res) => {
   const sessionItem = await Session.findById(req.params.id).select("-__v").populate('patient');
 
   if (!sessionItem)
-    return res.status(404).send("The session item with the given ID was not found.");
+    return res.status(404).send("The session with the given ID was not found.");
 
   res.send(sessionItem);
 });
